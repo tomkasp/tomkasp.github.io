@@ -109,7 +109,7 @@ invoke it as a constructor few things are happening:
 - Our Empty object is passed to our function as a this and becomes function context
 - in case of lack return statement this is returned
 
-You can see all examples here: https://github.com/tomkasp/javascript
+You can see all examples here: (https://github.com/tomkasp/javascript)
 
 
 Last method is with invoking apply() and call() methods and I'm going to cover it in separate blog post
