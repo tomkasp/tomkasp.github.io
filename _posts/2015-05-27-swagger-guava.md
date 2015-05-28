@@ -5,6 +5,7 @@ title: Swagger with Websphere 8.5.5 and ArrayIndexOutOfBoundsException
 
 Recently when I tried to deploy an app and I got below stack trace: 
 
+{% highlight xml %}
 [5/27/15 13:44:03:419 EDT] 00000001 ContainerHelp E   WSVR0501E: Error creating component com.ibm.ws.runtime.component.CompositionUnitMgrImpl@c2dcd39
 com.ibm.ws.exception.RuntimeWarning: com.ibm.ws.webcontainer.exception.WebAppNotLoadedException: Failed to load webapp: Failed to load webapp: java.lang.ArrayIndexOutOfBoundsException
         at com.ibm.ws.webcontainer.component.WebContainerImpl.install(WebContainerImpl.java:432)
@@ -54,17 +55,18 @@ Caused by: java.lang.ArrayIndexOutOfBoundsException
         at org.apache.webbeans.portable.AnnotatedElementFactory.newAnnotatedType(AnnotatedElementFactory.java:117)
         ... 31 more
         
+  {% endhighlight %}      
 
 Let me give you some context first. Application container is Websphere 8.5.5 and application is a very simple Spring web app with only one REST controller 
 and dependency to the swagger. The last thing, as it turned out, is crucial in the whole case. Swagger dependency: 
   
 {% highlight xml %}
 
-        <dependency>
-              <groupId>com.mangofactory</groupId>
-              <artifactId>swagger-springmvc</artifactId>
-              <version>0.8.8</version>
-        </dependency>
+<dependency>
+  <groupId>com.mangofactory</groupId>
+  <artifactId>swagger-springmvc</artifactId>
+  <version>0.8.8</version>
+</dependency>
         
 {% endhighlight %}
 
@@ -74,12 +76,12 @@ the issue: https://code.google.com/p/guava-libraries/wiki/Release15#A_note_on_JE
 The simplest solution is just to add a newer guava version like this:
 
 {% highlight xml %}
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>18.0</version>
-        </dependency>
+ 
+<dependency>
+    <groupId>com.google.guava</groupId>
+    <artifactId>guava</artifactId>
+    <version>18.0</version>
+</dependency>
         
 {% endhighlight %} 
 
