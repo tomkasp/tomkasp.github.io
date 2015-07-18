@@ -1,0 +1,34 @@
+Database queries
+
+--total cursors open, by username & machine
+SELECT SUM(a.value) total_cur
+      ,AVG(a.value) avg_cur
+      ,MAX(a.value) max_cur
+      ,s.username
+      ,s.machine
+  FROM v$sesstat  a
+      ,v$statname b
+      ,v$session  s
+ WHERE a.statistic# = b.statistic#
+   AND s.sid = a.sid
+   AND b.name = 'opened cursors current'
+ GROUP BY s.username
+         ,s.machine
+ ORDER BY 1 DESC;
+
+ --max open cursors per session
+ SELECT * FROM v$parameter WHERE NAME = 'open_cursors'
+
+
+
+  select a.value, s.username, s.sid, s.serial#,  s.machine
+  from v$sesstat a, v$statname b, v$session s
+  where a.statistic# = b.statistic#  and s.sid=a.sid
+  and b.name = 'opened cursors current' AND username = 'CASH_BREAK';
+
+  select s.program, s.server, p.spid server_pid, s.username
+   from v$session s, v$process p
+   where s.type = 'USER'
+     and s.username = 'CASH_BREAK'
+     and p.addr(+) = s.paddr;
+
