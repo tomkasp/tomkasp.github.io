@@ -1,0 +1,15 @@
+When you are dealing with database stored procedures and Java EE applications you can chose from many options.
+One of them is spring and it's support for a JDBC within JdbcTemplate class. http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/jdbc/core/JdbcTemplate.html
+
+In this post I want to focus on one method from this class and problem with opened cursors:  ORA-01000: maximum open cursors exceeded oracle exception.
+
+When you are using result set database cursor needs to be opened and points to the first position of the data which query
+or stored procedure return.
+
+Javadoc points:
+
+
+A ResultSet object is automatically closed when the Statement object that generated it is closed, re-executed, or used to retrieve the next result from a sequence of multiple results.
+
+but in my case I was using
+
