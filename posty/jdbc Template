@@ -3,13 +3,41 @@ One of them is spring and it's support for a JDBC within JdbcTemplate class. htt
 
 In this post I want to focus on one method from this class and problem with opened cursors:  ORA-01000: maximum open cursors exceeded oracle exception.
 
-When you are using result set database cursor needs to be opened and points to the first position of the data which query
-or stored procedure return.
+When you are using ResultSet class database cursor needs to be opened and points to the first position of the data which query
+or stored procedure return. But who should be responsible for closing it?
 
 Javadoc points:
-
-
 A ResultSet object is automatically closed when the Statement object that generated it is closed, re-executed, or used to retrieve the next result from a sequence of multiple results.
 
-but in my case I was using
+but in my case I was using JDBCTemplate class from spring and I thought that it can handle all boilarplate code for me
+and I don't need to manually close connection and statement. I used in my project method
+
+public <T> T execute(CallableStatementCreator csc, CallableStatementCallback<T> action)
+
+to execute stored procedure which as a one element returns cursor from which I can read the data through ResultSet. Code
+looks like this:
+
+jdbcTemplate.execute(
+        		cs,//this is callable statement
+                new CallableStatementCallback<Long>() {
+                    public Long doInCallableStatement(CallableStatement cs) throws SQLException {
+                        Long count = null;
+                        cs.execute();
+                        ResultSet rs = (ResultSet) cs.getObject("out_cursor");
+                        if (rs.next()) {
+                            count = Long.valueOf(rs.getString("COUNT(1)"));
+                        }
+                        return count;
+                    }
+                });
+
+I thought that it's enough and I don't need to do eny more - spring should handle everything else for me. I've checked
+source code of the execute method and it contains
+JdbcUtils.closeStatement(cs);
+			DataSourceUtils.releaseConnection(con, getDataSource())
+
+First line closes Statement in my case it's CallableStatement and second returns Connection to a connection pool.
+The problem is that those lines don't close ResultSet and after performance tests I ended with ORA-01000: maximum open cursors exceeded oracle exception.
+The simplest solution for me is to close ResultSet manually with a close method
+ rs.close(); or you can use a method from spring JdbcUtils closeResultSet.
 
